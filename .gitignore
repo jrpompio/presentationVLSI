@@ -1,0 +1,79 @@
+# --- LaTeX (generados) ---
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.brf
+*.idx
+*.ilg
+*.ind
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.run.xml
+
+# BibLaTeX / Biber
+*-blx.bib
+*.bib
+# Beamer
+*.nav
+*.snm
+*.vrb
+
+# Sincronización y compiladores
+*.synctex
+*.synctex.gz
+*.synctex(busy)
+*.fls
+*.fdb_latexmk
+
+# Formatos alternos
+*.dvi
+*.ps
+*.xdv
+
+# Nomencl, glossaries
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+*.glsdefs
+*.ist
+*.nlo
+*.nls
+*.nlg
+
+# TikZ externalize y auxiliares
+tikzextern*
+*.dpth
+*.md5
+*.auxlock
+
+# Minted / Listings
+_minted-*
+*.pyg
+*.listing
+
+# Carpetas de build comunes
+build/
+out/
+output/
+cache/
+tmp/
+
+# Editores / SO
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# salida
+*.pdf
+

@@ -1,0 +1,165 @@
+%% presentacion.tex
+\documentclass[aspectratio=169]{beamer}
+
+\usetheme[]{lu}
+% \setlufootleft{Autor — Curso/Institución}
+
+\usepackage{appendixnumberbeamer}
+\graphicspath{{graphics/}}
+
+\title{DREAMPlace\\Placement analítico acelerado en GPU}
+\author{Trabajo basado en el paper suministrado}
+\institute{Presentación académica}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}{Objetivo y promesa central}
+  \begin{itemize}
+    \item Acelerar el \emph{global placement} mediante GPU manteniendo
+          calidad.
+    \item Integración con toolkits de DL para optimización eficiente.
+    \item Resultados reportados: mejoras de tiempo de orden decenas de
+          veces.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Estado del arte y motivación}
+  \begin{itemize}
+    \item RePlAce en CPU como línea base ampliamente usada.
+    \item Saturación del rendimiento en CPU al escalar el tamaño del
+          diseño.
+    \item Hipótesis: reutilizar kernels GPU y autograd para acelerar sin
+          degradar métricas.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Analogía con aprendizaje profundo}
+  \begin{columns}[onlytextwidth]
+    \begin{column}{.55\textwidth}
+      \begin{itemize}
+        \item Función de costo $\rightarrow$ wirelength suavizado.
+        \item Regularización $\rightarrow$ penalización de densidad.
+        \item Optimización de primer orden con \emph{autograd}.
+        \item Bucle iterativo tipo entrenamiento: forward/backward.
+      \end{itemize}
+    \end{column}
+    \begin{column}{.45\textwidth}
+      \begin{figure}
+        \centering
+        % \includegraphics[width=\linewidth]{fig1_analogia}
+        \includegraphics[width=\linewidth]{example.jpeg}
+        \caption{Analogía DL $\leftrightarrow$ placement.}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Arquitectura y flujo}
+  \begin{itemize}
+    \item Núcleo en C++/CUDA expuesto a Python mediante el framework DL.
+    \item Operadores para wirelength, densidad y gradientes.
+    \item Flujo: Global Placement (GPU) $\rightarrow$ Legalización
+          (CPU) $\rightarrow$ Detailed Placement.
+  \end{itemize}
+  \begin{figure}
+    \centering
+    % \includegraphics[width=.9\linewidth]{fig2_arquitectura_flujo}
+        \includegraphics[width=\linewidth]{example.jpeg}
+    \caption{Arquitectura y flujo general GP$\rightarrow$LG$\rightarrow$DP.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Núcleo algorítmico (visión intuitiva)}
+  \begin{columns}[onlytextwidth]
+    \begin{column}{.55\textwidth}
+      \begin{itemize}
+        \item Wirelength suavizado: aproximación diferenciable de HPWL.
+        \item Densidad por analogía electrostática y solución de Poisson.
+        \item Uso de DCT/IDCT para resolver el potencial de forma
+              eficiente.
+        \item Gradientes exactos producidos por \emph{autograd}+kernels.
+      \end{itemize}
+    \end{column}
+    \begin{column}{.45\textwidth}
+      \begin{figure}
+        \centering
+        % \includegraphics[width=\linewidth]{fig4_pipeline_densidad}
+        \includegraphics[width=\linewidth]{example.jpeg}
+        \caption{Esquema de la penalización de densidad.}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Aceleraciones en GPU (kernels)}
+  \begin{itemize}
+    \item Kernel de wirelength a nivel de pin con operaciones atómicas.
+    \item DCT/IDCT implementadas con tamaños óptimos para el dominio.
+    \item Minimizar transferencias CPU$\leftrightarrow$GPU en el bucle
+          de optimización.
+  \end{itemize}
+  \begin{figure}
+    \centering
+    % \includegraphics[width=.9\linewidth]{fig7y8_kernels_gpu}
+        \includegraphics[width=\linewidth]{example.jpeg}
+    \caption{Comparativas de kernels de wirelength y DCT/IDCT.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Resultados: velocidad y escala}
+  \begin{columns}[onlytextwidth]
+    \begin{column}{.55\textwidth}
+      \begin{itemize}
+        \item Aceleraciones de orden $\times$30 o más en \emph{global
+              placement}.
+        \item Escalado estable al aumentar el número de celdas del
+              diseño.
+        \item Calidad del placement comparable frente al baseline.
+      \end{itemize}
+    \end{column}
+    \begin{column}{.45\textwidth}
+      \begin{figure}
+        \centering
+        % \includegraphics[width=\linewidth]{fig5_escalado}
+        \includegraphics[width=\linewidth]{example.jpeg}
+        \caption{Escalado en tiempo de ejecución con el tamaño.}
+      \end{figure}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Desglose de tiempo y cuellos de botella}
+  \begin{itemize}
+    \item GP y legalización consumen una fracción del tiempo total.
+    \item Detailed Placement domina el tiempo total del flujo.
+    \item Dentro de GP, la penalización de densidad es el componente más
+          costoso.
+  \end{itemize}
+  \begin{figure}
+    \centering
+    % \includegraphics[width=.9\linewidth]{fig6_breakdown}
+        \includegraphics[width=\linewidth]{example.jpeg}
+    \caption{Distribución de tiempo por etapa y por operador.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Conclusiones y trabajo futuro}
+  \begin{itemize}
+    \item Marco extensible: Python con operadores C++/CUDA especializados.
+    \item Aceleración significativa en GP sin degradar métricas de
+          calidad.
+    \item Trabajo futuro: DP en GPU, multi-GPU, rutabilidad y temporizado
+          en bucle.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+  \Closure{Gracias}{¿Preguntas?}
+\end{frame}
+
+\end{document}
+
